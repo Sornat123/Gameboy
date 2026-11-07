@@ -12,7 +12,7 @@
 
 ## Instalacja i uruchomienie
 ```bash
-git clone (https://github.com/Sornat123/Gameboy.git)
+git clone https://github.com/Sornat123/Gameboy.git
 python3 -m venv venv
 source venv/bin/activate
 pip install -r gameboy_web/requirements.txt
