@@ -13,9 +13,10 @@
 ## Instalacja i uruchomienie
 ```bash
 git clone https://github.com/Sornat123/Gameboy.git
+cd Gameboy
 python3 -m venv venv
 source venv/bin/activate
-pip install -r gameboy_web/requirements.txt
+pip install -r requirements.txt
 pygbag gameboy_web
 ```
 Po uruchomieniu gra jest dostępna w przeglądarce pod adresem http://localhost:8000
