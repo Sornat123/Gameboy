@@ -12,7 +12,7 @@ Projekt na ćwiczenia z Programowania Front-end, realizowany solo.
 
 Projekt składa się z dwóch części w jednym repozytorium:
 - `gameboy_web` – gry (Snake, Tetris, Labirynt, Kółko i krzyżyk) uruchamiane w przeglądarce przez pygbag (WebAssembly)
-- `gameboy_backend` – backend logowania i zapisu wyników (FastAPI + SQLite)
+- `gameboy_backend` – backend logowania i zapisu wyników (FastAPI + SQLite) oraz strona główna projektu (`index.html`)
 
 ## Technologie
 - Python 3.9 lub nowszy
@@ -33,20 +33,24 @@ Wszystkie biblioteki są w pliku `requirements.txt` w głównym katalogu.
     source venv/bin/activate
     pip install -r requirements.txt
 
-## Uruchomienie (dwa osobne terminale, w obu aktywne venv)
+## Uruchomienie (kolejność ma znaczenie)
 
-Terminal 1 – backend (port 8001):
+Potrzebne są dwa terminale, w obu z aktywnym venv (`source venv/bin/activate` w głównym katalogu repozytorium).
+
+**1. Backend (port 8001)**, terminal 1:
 
     cd gameboy_backend
     uvicorn main:app --port 8001
 
-Dokumentacja API: http://localhost:8001/docs
+Pod adresem http://localhost:8001 widać tylko komunikat, że backend działa, a pod http://localhost:8001/docs dokumentację API. To nie jest strona projektu.
 
-Terminal 2 – gry (port 8000), z głównego katalogu repozytorium:
+**2. Gry (port 8000)**, terminal 2, z głównego katalogu repozytorium:
 
     pygbag gameboy_web
 
-Gry otworzą się w przeglądarce pod adresem http://localhost:8000
+**3. Strona główna projektu.** Gdy oba serwery działają, otwórz w przeglądarce plik `gameboy_backend/index.html` (dwuklik w Finderze lub Eksploratorze albo, na macOS, komenda `open gameboy_backend/index.html`).
+
+Na tej stronie można się zarejestrować lub zalogować, a potem przejść do tabeli wyników albo kliknąć „Przejdź do Gier”, co otwiera platformę z grami pod adresem http://localhost:8000.
 
 ## Role użytkowników
 - admin – pełne uprawnienia i funkcje administracyjne
@@ -54,9 +58,9 @@ Gry otworzą się w przeglądarce pod adresem http://localhost:8000
 - guest – gracz bez logowania, wyniki nie są zapisywane
 
 ## Konto administratora
-1. Zarejestruj zwykłego użytkownika (przez /docs lub stronę index.html).
+1. Zarejestruj zwykłego użytkownika na stronie `index.html`.
 2. W pliku `gameboy_backend/make_admin.py` wpisz jego login w zmiennej target_username.
-3. Uruchom:
+3. Uruchom (z aktywnym venv):
 
        cd gameboy_backend
        python make_admin.py
