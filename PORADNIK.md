@@ -1,47 +1,35 @@
-# Gameboy Backend – technologie i poradnik uruchomienia
+# Gameboy Backend – poradnik
 
-Backend logowania i zapisu wyników dla platformy z grami (folder `gameboy_web` w tym samym repozytorium). Ogólny opis całego projektu jest w README w głównym katalogu repozytorium.
+Szczegóły backendu (FastAPI). Pełna instrukcja uruchomienia całego projektu jest w `README.md`.
 
-## Technologie
-- Python 3.9 lub nowszy
-- FastAPI – framework API (z automatyczną dokumentacją pod /docs)
-- Uvicorn – serwer uruchamiający aplikację
-- SQLAlchemy + SQLite – baza danych (plik gameboy.db tworzy się sam przy pierwszym starcie)
-- JWT (python-jose) – tokeny logowania
-- passlib + bcrypt – bezpieczne hashowanie haseł
-- Pydantic – walidacja danych
+## Co robi backend
+- rejestracja i logowanie użytkowników (hasła hashowane bcrypt, logowanie przez tokeny JWT)
+- zapis wyników graczy i tabela wyników (gry: snake, tetris, labirynt, kółko i krzyżyk)
+- role: admin, user, guest (gość nie ma zapisywanych wyników)
 
-## Role użytkowników
-- admin – pełne uprawnienia i dodatkowe funkcje administracyjne
-- user – zalogowany gracz, jego wyniki są zapisywane
-- guest – gracz bez logowania, wyniki nie są zapisywane
-
-## Uruchomienie backendu (port 8001)
+## Uruchomienie samego backendu (port 8001)
 
     git clone https://github.com/Sornat123/Gameboy.git
-    cd Gameboy/gameboy_backend
+    cd Gameboy
     python3 -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt
+    cd gameboy_backend
     uvicorn main:app --port 8001 --reload
 
-Dokumentacja i testowanie API w przeglądarce: http://localhost:8001/docs
+- http://localhost:8001 – komunikat, że backend działa
+- http://localhost:8001/docs – dokumentacja API do testowania w przeglądarce
+
+## Strona projektu
+Stroną, od której zaczyna się korzystanie z projektu, jest plik `gameboy_backend/index.html`. Otwiera się go w przeglądarce, gdy działa backend (port 8001) i gry (port 8000, `pygbag gameboy_web`).
 
 ## Konto administratora
-1. Zarejestruj zwykłego użytkownika (przez /docs lub stronę index.html).
-2. Otwórz make_admin.py i wpisz jego login w zmiennej target_username.
-3. Uruchom (z aktywnym venv, w folderze gameboy_backend):
+1. Zarejestruj użytkownika na stronie `index.html`.
+2. W `gameboy_backend/make_admin.py` wpisz jego login w zmiennej target_username.
+3. Uruchom w folderze `gameboy_backend` (z aktywnym venv):
 
        python make_admin.py
 
-## Uruchomienie platformy z grami (port 8000)
-W osobnym terminalu, w głównym katalogu repozytorium (Gameboy):
-
-    source gameboy_backend/venv/bin/activate
-    pygbag gameboy_web
-
-Gry otworzą się w przeglądarce pod adresem http://localhost:8000
-
 ## Uwagi
-- Baza gameboy.db nie jest w repozytorium – tworzy się automatycznie.
-- Pliki api_client.py i login_window.py.py to stary klient desktopowy (wymaga dodatkowo pygame i requests), nie jest potrzebny do działania serwera.
+- Baza `gameboy.db` tworzy się sama przy pierwszym starcie.
+- Pliki `api_client.py` i `login_window.py.py` to stary klient desktopowy, niepotrzebny do działania serwera.
