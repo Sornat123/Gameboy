@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Gameboy - Platforma gier</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #1a102b; color: #fff; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
+        .card, .dashboard, .user-menu, .user-panel, .games-menu { background: #281c3d; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); width: 850px; display: none; max-width: 100%; box-sizing: border-box; border: 1px solid #3f2c5e; }
+        .card { width: 350px; display: block; }
+        h2, h3 { text-align: center; margin-bottom: 20px; color: #dcd0ff; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #4f3978; background: #1f1430; color: #fff; border-radius: 4px; box-sizing: border-box; }
+        input:focus, select:focus { outline: none; border-color: #8a2be2; }
+        button { width: 100%; padding: 12px; background: #7b2cbf; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: background 0.2s; font-size: 15px; }
+        button:hover { background: #9d4edd; }
+        .btn-register { background: #3a86ff; }
+        .btn-register:hover { background: #4ea8de; }
+        .btn-guest { background: #6c757d; }
+        .btn-guest:hover { background: #5a6268; }
+        .btn-secondary { background: #480ca8; }
+        .btn-secondary:hover { background: #560bad; }
+        .btn-danger { background: #e63946; width: auto; padding: 5px 10px; margin: 0; display: inline-block; }
+        .btn-danger:hover { background: #d90429; }
+        .message { margin-top: 15px; text-align: center; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #4f3978; padding: 8px; text-align: left; font-size: 14px; }
+        th { background: #1f1430; color: #dcd0ff; }
+        .section { margin-bottom: 30px; border-top: 1px solid #3f2c5e; padding-top: 20px; }
+        .logout-btn { background: #f72585; margin-top: 20px; }
+        .logout-btn:hover { background: #b5179e; }
+        .filter-row { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
+        .menu-buttons { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<!-- FORMULARZ LOGOWANIA / REJESTRACJI -->
+<div class="card" id="login-section">
+    <h2>Gameboy</h2>
+    <input type="text" id="username" placeholder="Login">
+    <input type="password" id="password" placeholder="Hasło">
+    <button onclick="loginUser()">Zaloguj się</button>
+    <button class="btn-register" onclick="registerUser()">Zarejestruj się</button>
+    <button class="btn-guest" onclick="playAsGuest()">Graj jako gość</button>
+    <div id="message" class="message"></div>
+</div>
+
+<!-- GŁÓWNE MENU GRACZA -->
+<div class="user-menu" id="user-menu">
+    <h2>Witaj, <span id="user-menu-name" style="color: #c77dff;"></span>!</h2>
+    <p style="text-align: center; color: #b19cd9; margin-bottom: 30px;">Wybierz co chcesz zrobić:</p>
+    
+    <div class="menu-buttons">
+        <button onclick="showUserPanel('scores')">🏆 Tabela Wyników</button>
+        <button class="btn-secondary" onclick="showUserPanel('games')">🎮 Przejdź do Gier</button>
+    </div>
+
+    <button class="logout-btn" onclick="logout()">Wyloguj się</button>
+</div>
+
+<!-- PANEL TABELI WYNIKÓW -->
+<div class="user-panel" id="user-panel">
+    <h2>Tabela Wyników</h2>
+    <div class="section" style="border-top: none; margin-bottom: 15px;">
+        <div class="filter-row">
+            <label for="game-filter">Wybierz grę:</label>
+            <select id="game-filter" onchange="fetchUserScores()">
+                <option value="">Wszystkie gry</option>
+                <option value="1">Snake</option>
+                <option value="2">Tetris</option>
+                <option value="3">Labirynt</option>
+                <option value="4">Kółko i Krzyżyk</option>
+            </select>
+        </div>
+        <table>
+            <thead>
+                <tr><th>Miejsce</th><th>Gra</th><th>Gracz</th><th>Wynik</th></tr>
+            </thead>
+            <tbody id="user-scores-table-body"></tbody>
+        </table>
+    </div>
+    <button class="btn-secondary" onclick="showUserMenu()">← Powrót do menu</button>
+</div>
+
+<!-- MENU WYBORU GIER -->
+<div class="games-menu" id="games-menu">
+    <h2>Wybierz Grę</h2>
+    <p style="text-align: center; color: #b19cd9;">Kliknij poniższy przycisk, aby uruchomić platformę Game Boy:</p>
+    
+    <div class="menu-buttons" style="margin-top: 10px;">
+        <button class="btn-secondary" onclick="launchGameboy()" style="background-color: #2a9d8f; font-size: 16px; padding: 15px;">🎮 Otwórz Wirtualnego Gameboya</button>
+    </div>
+
+    <button class="btn-secondary" style="margin-top: 25px;" onclick="showUserMenu()">← Powrót do menu</button>
+</div>
+
+<!-- PANEL ADMINISTRATORA -->
+<div class="dashboard" id="admin-dashboard">
+    <h2>Panel Administratora</h2>
+    <p id="admin-welcome" style="text-align: center; color: #c77dff; font-weight: bold;"></p>
+    
+    <div class="section" style="border-top: none;">
+        <h3>Dodaj nowego użytkownika</h3>
+        <input type="text" id="new-username" placeholder="Login nowego użytkownika">
+        <input type="password" id="new-password" placeholder="Hasło">
+        <select id="new-role">
+            <option value="user">Użytkownik (User)</option>
+            <option value="admin">Administrator (Admin)</option>
+        </select>
+        <button onclick="adminCreateUser()">Utwórz użytkownika</button>
+    </div>
+
+    <div class="section">
+        <h3>Zarządzanie Użytkownikami</h3>
+        <table>
+            <thead>
+                <tr><th>ID</th><th>Login</th><th>Rola</th><th>Akcja</th></tr>
+            </thead>
+            <tbody id="users-table-body"></tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h3>Zarządzanie Wynikami (Scores)</h3>
+        <p style="text-align: center; color: #b19cd9; font-size: 13px;">Labirynt: wynik to czas w milisekundach (1000 = 1 sekunda).</p>
+        <table>
+            <thead>
+                <tr><th>ID</th><th>Gra</th><th>Gracz</th><th>Wynik</th><th>Akcje</th></tr>
+            </thead>
+            <tbody id="scores-table-body"></tbody>
+        </table>
+    </div>
+
+    <button class="logout-btn" onclick="logout()">Wyloguj się</button>
+</div>
+
+<script>
+    const API_URL = "http://127.0.0.1:8001";
+    const GAME_URL = "http://localhost:8000/";
+    let currentUserLogin = "";
+
+    const gameNames = {
+        1: "Snake",
+        2: "Tetris",
+        3: "Labirynt",
+        4: "Kółko i Krzyżyk"
+    };
+
+    function getGameName(gameId) {
+        return gameNames[gameId] ? `${gameId} (${gameNames[gameId]})` : `${gameId} (Nieznana gra)`;
+    }
+
+    
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    
+    function formatScore(gameId, score) {
+        if (gameId === 3) return `${score} poziomów`;
+        if (gameId === 4) return `${score} pkt`;
+        return String(score);
+    }
+
+    function parseJwt(token) {
+        try {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async function loginUser() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const msgDiv = document.getElementById('message');
+
+        try {
+            const response = await fetch(`${API_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem("token", data.access_token);
+                const tokenData = parseJwt(data.access_token);
+                
+                if (tokenData && tokenData.role === "admin") {
+                    loadAdminPanel(tokenData.sub);
+                } else {
+                    currentUserLogin = tokenData.sub;
+                    showUserMenu();
+                }
+            } else {
+                msgDiv.style.color = "#ff6b6b";
+                msgDiv.innerText = data.detail || "Błąd logowania";
+            }
+        } catch (error) {
+            msgDiv.style.color = "#ff6b6b";
+            msgDiv.innerText = "Błąd połączenia z serwerem.";
+        }
+    }
+
+    async function registerUser() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const msgDiv = document.getElementById('message');
+
+        try {
+            const response = await fetch(`${API_URL}/api/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                msgDiv.style.color = "#c77dff";
+                msgDiv.innerText = "Rejestracja udana! Możesz się zalogować.";
+            } else {
+                msgDiv.style.color = "#ff6b6b";
+                msgDiv.innerText = data.detail || "Błąd rejestracji";
+            }
+        } catch (error) {
+            msgDiv.style.color = "#ff6b6b";
+            msgDiv.innerText = "Błąd połączenia z serwerem.";
+        }
+    }
+
+    function playAsGuest() {
+        localStorage.removeItem("token");
+        currentUserLogin = "Gość";
+        showUserMenu();
+    }
+
+    function showUserMenu() {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('user-panel').style.display = 'none';
+        document.getElementById('games-menu').style.display = 'none';
+        document.getElementById('admin-dashboard').style.display = 'none';
+        
+        document.getElementById('user-menu').style.display = 'block';
+        document.getElementById('user-menu-name').innerText = currentUserLogin;
+    }
+
+    function showUserPanel(view) {
+        document.getElementById('user-menu').style.display = 'none';
+        if (view === 'scores') {
+            document.getElementById('user-panel').style.display = 'block';
+            fetchUserScores();
+        } else if (view === 'games') {
+            document.getElementById('games-menu').style.display = 'block';
+        }
+    }
+
+    function loadAdminPanel(username) {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('user-menu').style.display = 'none';
+        document.getElementById('user-panel').style.display = 'none';
+        document.getElementById('games-menu').style.display = 'none';
+        
+        document.getElementById('admin-dashboard').style.display = 'block';
+        document.getElementById('admin-welcome').innerText = `Zalogowano jako Administrator: ${username}`;
+        fetchAdminData();
+    }
+
+    
+    function launchGameboy() {
+        const token = localStorage.getItem("token");
+        const url = token
+            ? `${GAME_URL}#token=${encodeURIComponent(token)}`
+            : GAME_URL;
+        window.open(url, '_blank');
+    }
+
+    
+    async function fetchUserScores() {
+        const gameId = document.getElementById('game-filter').value;
+        const ids = gameId ? [parseInt(gameId)] : [1, 2, 3, 4];
+        const tbody = document.getElementById('user-scores-table-body');
+        tbody.innerHTML = "";
+
+        for (const id of ids) {
+            try {
+                const res = await fetch(`${API_URL}/api/leaderboard/${id}`);
+                if (!res.ok) continue;
+                const rows = await res.json();
+                rows.forEach((r, index) => {
+                    tbody.innerHTML += `<tr>
+                        <td>#${index + 1}</td>
+                        <td>${gameNames[id]}</td>
+                        <td>${escapeHtml(r.username)}</td>
+                        <td>${formatScore(id, r.score)}</td>
+                    </tr>`;
+                });
+            } catch (e) {
+                console.error("Błąd pobierania wyników", e);
+            }
+        }
+
+        if (tbody.innerHTML === "") {
+            tbody.innerHTML = `<tr><td colspan="4">Brak wyników</td></tr>`;
+        }
+    }
+
+    async function fetchAdminData() {
+        const token = localStorage.getItem("token");
+        const headers = { 'Authorization': `Bearer ${token}` };
+
+        let usersMap = {};
+        try {
+            const resUsers = await fetch(`${API_URL}/api/admin/users`, { headers });
+            if (resUsers.ok) {
+                const users = await resUsers.json();
+                let tbody = document.getElementById('users-table-body');
+                tbody.innerHTML = "";
+                users.forEach(u => {
+                    usersMap[u.id] = u.username;
+                    tbody.innerHTML += `<tr>
+                        <td>${u.id}</td>
+                        <td>${escapeHtml(u.username)}</td>
+                        <td>${escapeHtml(u.role)}</td>
+                        <td><button class="btn-danger" onclick="deleteUser(${u.id})">Usuń</button></td>
+                    </tr>`;
+                });
+            }
+        } catch(e) { console.error("Błąd pobierania użytkowników", e); }
+
+        try {
+            const resScores = await fetch(`${API_URL}/api/admin/scores`, { headers });
+            if (resScores.ok) {
+                const scores = await resScores.json();
+                let tbody = document.getElementById('scores-table-body');
+                tbody.innerHTML = "";
+                scores.forEach(s => {
+                    const playerName = usersMap[s.user_id] ? escapeHtml(usersMap[s.user_id]) : `ID: ${s.user_id}`;
+                    
+                    let gameSelectHtml = `<select id="score-game-${s.id}" style="width: 130px; margin: 0;">
+                        <option value="1" ${s.game_id === 1 ? 'selected' : ''}>1 (Snake)</option>
+                        <option value="2" ${s.game_id === 2 ? 'selected' : ''}>2 (Tetris)</option>
+                        <option value="3" ${s.game_id === 3 ? 'selected' : ''}>3 (Labirynt)</option>
+                        <option value="4" ${s.game_id === 4 ? 'selected' : ''}>4 (Kółko i Krzyżyk)</option>
+                    </select>`;
+
+                    tbody.innerHTML += `<tr>
+                        <td>${s.id}</td>
+                        <td>${gameSelectHtml}</td>
+                        <td>${playerName}</td>
+                        <td><input type="number" id="score-val-${s.id}" value="${s.score}" style="width: 80px; margin: 0;"></td>
+                        <td>
+                            <button onclick="updateScore(${s.id})">Zmień</button>
+                            <button class="btn-danger" onclick="deleteScore(${s.id})">Usuń</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+        } catch(e) { console.error("Błąd pobierania wyników", e); }
+    }
+
+    async function adminCreateUser() {
+        const username = document.getElementById('new-username').value;
+        const password = document.getElementById('new-password').value;
+        const role = document.getElementById('new-role').value;
+
+        if(!username || !password) {
+            alert("Wypełnij login i hasło nowego użytkownika!");
+            return;
+        }
+
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_URL}/api/admin/users`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({ username, password, role })
+        });
+
+        if(res.ok) {
+            alert("Użytkownik został dodany pomyślnie!");
+            document.getElementById('new-username').value = "";
+            document.getElementById('new-password').value = "";
+            fetchAdminData();
+        } else {
+            const data = await res.json();
+            alert(data.detail || "Nie udało się dodać użytkownika.");
+        }
+    }
+
+    async function deleteUser(userId) {
+        if(!confirm("Na pewno chcesz usunąć tego użytkownika?")) return;
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_URL}/api/admin/users/${userId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(res.ok) fetchAdminData();
+        else alert("Nie udało się usunąć użytkownika.");
+    }
+
+    async function deleteScore(scoreId) {
+        if(!confirm("Na pewno chcesz usunąć ten wynik?")) return;
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_URL}/api/admin/scores/${scoreId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(res.ok) fetchAdminData();
+        else alert("Nie udało się usunąć wyniku.");
+    }
+
+    async function updateScore(scoreId) {
+        const gameSelect = document.getElementById(`score-game-${scoreId}`);
+        const scoreInput = document.getElementById(`score-val-${scoreId}`);
+        
+        if (!gameSelect || !scoreInput) {
+            alert("Nie znaleziono elementów formularza edycji.");
+            return;
+        }
+
+        const newGameId = parseInt(gameSelect.value);
+        const newVal = parseInt(scoreInput.value);
+        const token = localStorage.getItem("token");
+        
+        const res = await fetch(`${API_URL}/api/admin/scores/${scoreId}`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({ 
+                game_id: newGameId, 
+                score: newVal 
+            })
+        });
+        
+        if(res.ok) {
+            alert("Zaktualizowano wynik pomyślnie!");
+            fetchAdminData();
+        } else {
+            const errData = await res.json();
+            alert("Błąd aktualizacji wyniku: " + (errData.detail || "Nieznany błąd"));
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem("token");
+        document.getElementById('admin-dashboard').style.display = 'none';
+        document.getElementById('user-menu').style.display = 'none';
+        document.getElementById('user-panel').style.display = 'none';
+        document.getElementById('games-menu').style.display = 'none';
+        document.getElementById('login-section').style.display = 'block';
+        document.getElementById('username').value = "";
+        document.getElementById('password').value = "";
+        document.getElementById('message').innerText = "";
+    }
+</script>
+
+</body>
+</html>
