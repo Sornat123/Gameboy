@@ -44,4 +44,4 @@ Gry otworzą się w przeglądarce pod adresem http://localhost:8000
 
 ## Uwagi
 - Baza gameboy.db nie jest w repozytorium – tworzy się automatycznie.
-- Pliki api_client.py i login_window.py.py to stary klient desktopowy (wymaga dodatkowo pygame i requests), nie jest potrzebny do działania serwera.to stary klient desktopowy (wymaga dodatkowo pygame i requests), nie jest potrzebny do działania serwera.
+- Pliki api_client.py i login_window.py.py to stary klient desktopowy (wymaga dodatkowo pygame i requests), nie jest potrzebny do działania serwera.
