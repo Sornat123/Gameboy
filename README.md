@@ -48,8 +48,7 @@ Pod adresem http://localhost:8001 widać tylko komunikat, że backend działa, a
 
     pygbag gameboy_web
 
-**3. Strona główna projektu.** Gdy oba serwery działają, otwórz w przeglądarce plik `gameboy_backend/index.html` (dwuklik w Finderze lub Eksploratorze albo, na macOS, komenda `open gameboy_backend/index.html`).
-
+**3. Strona główna projektu.** Gdy oba serwery działają, otwórz w przeglądarce plik `gameboy_backend/index.html` 
 Na tej stronie można się zarejestrować lub zalogować, a potem przejść do tabeli wyników albo kliknąć „Przejdź do Gier”, co otwiera platformę z grami pod adresem http://localhost:8000.
 
 ## Role użytkowników
